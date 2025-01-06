@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>unalogOS v2</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            overflow: hidden;
+            user-select: none;
+            color: white; 
+        }
+
+        #desktop {
+            background-image: url(''); 
+            background-size: cover;
+            height: calc(100vh - 40px);
+            overflow: hidden;
+            position: relative;
+        }
+
+        #taskbar {
+            background-color: #141414;
+            height: 40px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            color: white;
+            padding: 0 10px;
+            font-size: 14px;
+            box-shadow: 0px -3px 10px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+        }
+
+        .start-btn {
+            background-color: #222222;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .start-btn:hover {
+            background-color: #141414;
+        }
+
+        .wallpaper-btn {
+            background-color: #222222;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .wallpaper-btn:hover {
+            background-color: #141414;
+        }
+
+        .icon {
+            width: 60px;
+            height: 60px;
+            background-color: #141414;
+            margin: 10px;
+            padding: 10px;
+            text-align: center;
+            float: left;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+        }
+
+        .icon:hover {
+            background-color: #141414;
+        }
+
+        .window {
+            display: none;
+            position: absolute;
+            background-color: #141414;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            z-index: 2;
+            border-radius: 10px;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .window.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            color: #888;
+            font-size: 18px;
+            transition: color 0.3s;
+        }
+
+        .close-btn:hover {
+            color: #555;
+        }
+
+        /* Context Menu */
+        #contextMenu {
+            display: none;
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 9999;
+        }
+
+        #contextMenu.show {
+            display: block;
+        }
+
+        #contextMenu button {
+            background: none;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            cursor: pointer;
+            display: block;
+            margin: 5px 0;
+            transition: background-color 0.3s;
+        }
+
+        #contextMenu button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        #date-time {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            color: white;
+            font-size: 14px;
+        }
+
+        #date-time span {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="desktop">
+    <div class="icon" onclick="openWindow('window1')"></div>
+    <div class="icon" onclick="openWindow('window2')"></div>
+    <div class="icon" onclick="openWindow('window3')"></div>
+    <div class="icon" onclick="openWindow('window4')"></div>
+    <div class="icon" onclick="openWindow('window5')"></div>
+
+    <div id="window1" class="window" onmousedown="startDrag(event, 'window1')">
+        <div class="close-btn" onclick="closeWindow('window1')">X</div>
+        <h2>App 1</h2>
+        <p>This is the content of App 1.</p>
+    </div>
+
+    <div id="window2" class="window" onmousedown="startDrag(event, 'window2')">
+        <div class="close-btn" onclick="closeWindow('window2')">X</div>
+        <h2>App 2</h2>
+        <p>This is the content of App 2.</p>
+    </div>
+
+    <div id="window3" class="window" onmousedown="startDrag(event, 'window3')">
+        <div class="close-btn" onclick="closeWindow('window3')">X</div>
+        <h2>App 3</h2>
+        <p>This is the content of App 3.</p>
+    </div>
+
+    <div id="window4" class="window" onmousedown="startDrag(event, 'window4')">
+        <div class="close-btn" onclick="closeWindow('window4')">X</div>
+        <h2>App 4</h2>
+        <p>This is the content of App 4.</p>
+    </div>
+
+    <div id="window5" class="window" onmousedown="startDrag(event, 'window5')">
+        <div class="close-btn" onclick="closeWindow('window5')">X</div>   
+        <h2>Credits</h2>
+        <p>unalogOS was developed and created by unalog himself</p>
+    </div>
+</div>
+
+<div id="contextMenu" oncontextmenu="return false;">
+    <button onclick="openAllApps()">Open All Apps</button>
+    <button onclick="changeWallpaper()">Change Wallpaper</button>
+</div>
+
+<div id="taskbar">
+    <button class="start-btn" onclick="toggleStartMenu()">Start</button>
+    <button class="wallpaper-btn" onclick="changeWallpaper()">Change Wallpaper</button>
+    <!-- Add a hidden input for file upload -->
+  <input type="file" id="wallpaperInput" style="display:none" accept="image/*" onchange="handleWallpaperChange()">
+</div>
+
+<div id="date-time" class="date-time">
+    <span id="date"></span>
+    <span id="time"></span>
+</div>
+
+<script>
+    document.getElementById('desktop').addEventListener('contextmenu', function(e) {
+        e.preventDefault(); 
+        const contextMenu = document.getElementById('contextMenu');
+        contextMenu.style.left = e.pageX + 'px';
+        contextMenu.style.top = e.pageY + 'px';
+        contextMenu.classList.add('show');
+    });
+
+
+    document.addEventListener('click', function(e) {
+        const contextMenu = document.getElementById('contextMenu');
+        if (!contextMenu.contains(e.target)) {
+            contextMenu.classList.remove('show');
+        }
+    });
+
+    function openWindow(windowId) {
+        let windowElement = document.getElementById(windowId);
+        windowElement.style.display = "block";
+        setTimeout(() => {
+            windowElement.classList.add('active');
+        }, 10);
+        updateTaskbar();
+    }
+
+    function closeWindow(windowId) {
+        let windowElement = document.getElementById(windowId);
+        windowElement.classList.remove('active');
+        setTimeout(() => {
+            windowElement.style.display = "none";
+            updateTaskbar();
+        }, 300);
+    }
+
+    function startDrag(e, windowId) {
+        let offsetX = e.clientX - document.getElementById(windowId).getBoundingClientRect().left;
+        let offsetY = e.clientY - document.getElementById(windowId).getBoundingClientRect().top;
+
+        function dragMove(e) {
+            let x = e.clientX - offsetX;
+            let y = e.clientY - offsetY;
+
+            document.getElementById(windowId).style.left = x + 'px';
+            document.getElementById(windowId).style.top = y + 'px';
+        }
+
+        function dragEnd() {
+            window.removeEventListener('mousemove', dragMove);
+            window.removeEventListener('mouseup', dragEnd);
+        }
+
+        window.addEventListener('mousemove', dragMove);
+        window.addEventListener('mouseup', dragEnd);
+    }
+
+    function updateTaskbar() {
+        let openWindows = document.querySelectorAll('.window.active');
+        let taskbar = document.getElementById('taskbar');
+
+        taskbar.innerHTML = '<button class="start-btn" onclick="toggleStartMenu()">Start</button>';
+        taskbar.innerHTML += '<button class="wallpaper-btn" onclick="changeWallpaper()">Change Wallpaper</button>';
+
+        openWindows.forEach(function (window) {
+            let windowTitle = window.querySelector('h2').textContent;
+            taskbar.innerHTML += `<button onclick="focusWindow('${window.id}')">${windowTitle}</button>`;
+        });
+    }
+
+    function toggleStartMenu() {
+        alert('Start Menu opened!');
+    }
+
+    function focusWindow(windowId) {
+        let window = document.getElementById(windowId);
+        window.style.zIndex = ++highestZIndex;
+    }
+
+    function changeWallpaper() {
+        // Trigger the file input
+        document.getElementById('wallpaperInput').click();
+    }
+
+    function openAllApps() {
+        openWindow('window1');
+        openWindow('window2');
+        openWindow('window3');
+        openWindow('window4');
+        openWindow('window5');
+    }
+
+    function handleWallpaperChange() {
+        let wallpaperInput = document.getElementById('wallpaperInput');
+        let wallpaperUrl = URL.createObjectURL(wallpaperInput.files[0]);
+        document.getElementById('desktop').style.backgroundImage = `url('${wallpaperUrl}')`;
+    }
+
+    function updateTime() {
+        const now = new Date();
+        const dateElement = document.getElementById('date');
+        const timeElement = document.getElementById('time');
+
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const formattedDate = now.toLocaleDateString(undefined, options);
+
+        const formattedTime = now.toLocaleTimeString();
+
+        dateElement.textContent = formattedDate;
+        timeElement.textContent = formattedTime;
+    }
+
+  
+    setInterval(updateTime, 1000);
+
+
+    updateTime();
+
+
+    window.onload = function () {
+        const wallpapers = [
+            'wallpaper1.png',
+            'wallpaper2.png',
+            'wallpaper3 (2).png',
+            'wallpaper4.png',
+
+        ];
+        const randomIndex = Math.floor(Math.random() * wallpapers.length);
+        const randomWallpaper = wallpapers[randomIndex];
+        document.getElementById('desktop').style.backgroundImage = `url('wallpapers/${randomWallpaper}')`;
+    };
+</script>
+
+</body>
+</html>
